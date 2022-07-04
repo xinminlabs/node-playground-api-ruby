@@ -1,0 +1,15 @@
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+/log/
+/vendor/
+
+.env.local
+
+# rspec failure tracking
+.rspec_status
+
