@@ -1,4 +1,6 @@
 class App < Sinatra::Base
+  register Sinatra::Cors
+
   set :allow_origin, '*'
   set :allow_headers, 'Accept,Authorization,Content-Type'
   set :allow_methods, 'GET,POST'
