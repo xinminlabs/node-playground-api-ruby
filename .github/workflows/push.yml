@@ -1,0 +1,41 @@
+name: test and publish
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v2
+     - name: Set up Ruby
+       uses: ruby/setup-ruby@v1
+       with:
+         ruby-version: 3.1.2
+         bundler-cache: true
+     - name: Run tests
+       run: bundle exec rspec
+
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Short SHA
+        id: sha
+        run: echo "::set-output name=sha7::$(echo ${GITHUB_SHA} | cut -c1-7)"
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ github.repository  }}:${{ steps.sha.outputs.sha7 }}
