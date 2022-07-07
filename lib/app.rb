@@ -29,6 +29,14 @@ class App < Sinatra::Base
     respond_error(error: e.message)
   end
 
+  post '/mutate-code' do
+    params = ActiveSupport::JSON.decode(request.body.read)
+    result = mutate_code(params['nql'], params['source_code'], params['mutation_code'])
+    respond_ok(affected: result.affected?, conflicted: result.conflicted?, new_source: result.new_source)
+  rescue StandardError => e
+    respond_error(error: e.message)
+  end
+
   private
 
   def respond_error(body)
@@ -54,5 +62,15 @@ class App < Sinatra::Base
         end: { line: end_loc.line, column: end_loc.column }
       }
     end
+  end
+
+  def mutate_code(nql, source, mutation_code)
+    node = generate_ast(source)
+    matching_nodes = NodeQuery.new(nql).parse(node)
+    mutation = NodeMutation.new(source)
+    matching_nodes.each do |node|
+      mutation.instance_eval(mutation_code)
+    end
+    mutation.process
   end
 end

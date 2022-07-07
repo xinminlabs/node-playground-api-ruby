@@ -62,4 +62,16 @@ RSpec.describe App do
       expect(json_response_body).to eq('ranges' => [{ 'start' => { 'line' => 1, 'column' => 0 }, 'end' => { 'line' => 1, 'column' => 18 } }])
     end
   end
+
+  describe 'POST /mutate-code' do
+    it 'gets new source' do
+      nql = '.class'
+      source_code = 'class Synvert; end'
+      mutation_code = 'replace(node, :name, with: "Foobar")'
+      post '/mutate-code', { nql: nql, source_code: source_code, mutation_code: mutation_code }.to_json
+
+      expect(last_response).to be_ok
+      expect(json_response_body).to eq('affected' => true, 'conflicted' => false, 'new_source' => 'class Foobar; end')
+    end
+  end
 end
