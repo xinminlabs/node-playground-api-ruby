@@ -19,6 +19,7 @@ jobs:
 
   publish:
     name: publish
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Get Short SHA
